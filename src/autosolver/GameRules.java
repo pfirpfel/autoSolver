@@ -6,13 +6,15 @@
 package autosolver;
 
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 /**
  *
  * @author Elias
  */
 public class GameRules {
-    int freeGridStart,freeGridUp,freeGridRight,freeGridDown,freeGridLeft;
+
+    int freeGridStart, freeGridUp, freeGridRight, freeGridDown, freeGridLeft;
 //    boolean moveableUp,moveableRight,moveableDown,moveableLeft;
     //the game starts with two random numbers at random positions
     //can only go up/down/right/left wiith the arrows
@@ -22,75 +24,91 @@ public class GameRules {
 
     //simulates the move and gives back the new number of free Grids
     public int simulate(int grid[][]) {
-        freeGridStart=g1.gerFreeGrids(grid);
+        freeGridStart = g1.gerFreeGrids(grid);
         simulateStep1(grid);
         //grösste zahl = beste methode
-        if(freeGridUp>=freeGridDown&&freeGridUp>=freeGridRight&&freeGridUp>=freeGridLeft){
-            return KeyEvent.VK_UP;
-        }else if(freeGridRight>=freeGridLeft&&freeGridRight>=freeGridDown){
-            return KeyEvent.VK_RIGHT;
-        }else if(freeGridLeft>=freeGridDown){
-            return KeyEvent.VK_LEFT;
-        }else{
-        return KeyEvent.VK_DOWN;
+        //überprüft welches die grösste zahl ist und liefert den key dazu;
+        int best = freeGridUp;
+        int key = KeyEvent.VK_UP;
+        if (best < freeGridDown) {
+            best = freeGridDown;
+            key = KeyEvent.VK_DOWN;
         }
+        if (best < freeGridRight) {
+            best = freeGridRight;
+            key = KeyEvent.VK_RIGHT;
+        }
+        if (best < freeGridLeft) {
+            key = KeyEvent.VK_LEFT;
+        }
+        return key;
     }
-    private void simulateStep1(int grid[][]){
+
+    private void simulateStep1(int grid[][]) {
+
         int gridUp[][] = this.up(grid);
-        if(g1.gridChanged(gridUp)==true){
-            freeGridUp = g1.gerFreeGrids(gridUp);
+        Arrays.copyOf(grid, grid.length);
+        freeGridUp = g1.gerFreeGrids(gridUp);
+        if (g1.gridChanged(gridUp, grid)) {
             simulateUp(gridUp);
-        }else{
-            freeGridUp=-100;
+        } else {
+            freeGridUp -= 100;
         }
-        int gridDown[][] = this.down(grid);
-        if(g1.gridChanged(gridDown)==true){
-            freeGridDown = g1.gerFreeGrids(gridDown);
+        int gridDown[][] = this.down(Arrays.copyOf(grid, grid.length));
+        freeGridDown = g1.gerFreeGrids(gridDown);
+        if (g1.gridChanged(gridDown, grid)) {
             simulateDown(gridDown);
-        }else{
-            freeGridDown=-100;
-        }  
-        int gridRight[][] = this.up(grid);
-        if(g1.gridChanged(gridRight)==true){
-            freeGridRight = g1.gerFreeGrids(gridRight);
-            simulateRight(gridRight);
-        }else{
-            freeGridRight=-100;
+        } else {
+            freeGridDown -= 100;
         }
-        int gridLeft[][] = this.down(grid);
-        if(g1.gridChanged(gridLeft)==true){
-            freeGridLeft = g1.gerFreeGrids(gridLeft);
+        int gridRight[][] = this.right(Arrays.copyOf(grid, grid.length));
+        freeGridRight = g1.gerFreeGrids(gridRight);
+
+        if (g1.gridChanged(gridRight, grid)) {
+            simulateRight(gridRight);
+        } else {
+            freeGridRight -= 100;
+        }
+        int gridLeft[][] = this.left(Arrays.copyOf(grid, grid.length));
+        freeGridLeft = g1.gerFreeGrids(gridLeft);
+        if (g1.gridChanged(gridLeft, grid)) {
             simulateLeft(gridLeft);
-        }else{
-            freeGridLeft=-100;
-        } 
+        } else {
+            freeGridLeft -= 100;
+        }
     }
 //simulates the move and gives back the Grids
-    private void simulateRight(int grid[][]){
-        
+
+    private void simulateRight(int egrid[][]) {
+
     }
-    private void simulateDown(int grid[][]){
-        
+
+    private void simulateDown(int egrid[][]) {
+
     }
-    private void simulateLeft(int grid[][]){
-        
+
+    private void simulateLeft(int egrid[][]) {
+
     }
-    private void simulateUp(int grid[][]){
-        
+
+    private void simulateUp(int egrid[][]) {
+
     }
-    private int[][] up(int grid[][]) {
+
+    public int[][] up(int egrid[][]) {
         //all numbers will go up and combine when possible
-        for (int index = 0; index < 4; index++) {
-            for (int i = 0; i < 3; i++) {
-                if (grid[index][i] == 0) {
-                    for (int a = i; a < 3; a++) {
-                        grid[index][i] = grid[index][i + 1];
+        int[][] grid = clone2DArray(egrid);
+        for (int yIndex = 3; yIndex > 0; yIndex--) {
+            for (int xIndex = 0; xIndex < 4; xIndex++) {
+                if (grid[yIndex - 1][xIndex] == grid[yIndex][xIndex]) {
+                    grid[yIndex][xIndex] += grid[yIndex][xIndex];
+                    grid[yIndex - 1][xIndex] = 0;
+                }
+                if (grid[yIndex - 1][xIndex] == 0) {
+                    for (int a = yIndex - 1; a < 3; a++) {
+                        grid[a][xIndex] = grid[a + 1][xIndex];
                     }
-                } else if (grid[index][i] == grid[index][i + 1]) {
-                    grid[index][i] += grid[index][i];
-                    for (int a = i + 1; a < 4; a++) {
-                        grid[index][i] = grid[index][i + 1];
-                    }
+                    grid[3][xIndex] = 0;
                 }
             }
         }
@@ -98,62 +116,89 @@ public class GameRules {
     }
 
     //simulates the move and gives back the Grids
-    private int[][] right(int grid[][]) {
+    public int[][] right(int egrid[][]) {
         //all numbers will right up and combine when possible
+        int[][] grid = clone2DArray(egrid);
+        for (int yIndex = 0; yIndex < 4; yIndex++) {
+            for (int xIndex = 0; xIndex < 3; xIndex++) {
+                if (grid[yIndex][xIndex] == grid[yIndex][xIndex + 1]) {
+                    grid[yIndex][xIndex] += grid[yIndex][xIndex];
+                    grid[yIndex][xIndex + 1] = 0;
+                }
+                if (grid[yIndex][xIndex + 1] == 0) {
+                    for (int a = xIndex + 1; a > 0; a--) {
+                        grid[yIndex][a] = grid[yIndex][a - 1];
+                    }
+                    grid[yIndex][0] = 0;
+                }
+            }
+        }
+        return grid;
+    }
+//simulates the move and gives back the Grids
+
+    public int[][] down(int egrid[][]) {
+        //all numbers will down up and combine when possible
+        int[][] grid = clone2DArray(egrid);
+        for (int yIndex = 0; yIndex < 3; yIndex++) {
+            for (int xIndex = 0; xIndex < 4; xIndex++) {
+                if (grid[yIndex + 1][xIndex] == grid[yIndex][xIndex]) {
+                    grid[yIndex][xIndex] += grid[yIndex][xIndex];
+                    grid[yIndex + 1][xIndex] = 0;
+                }
+                if (grid[yIndex + 1][xIndex] == 0) {
+                    for (int a = yIndex + 1; a > 0; a--) {
+                        grid[a][xIndex] = grid[a - 1][xIndex];
+                    }
+                    grid[0][xIndex] = 0;
+                }
+            }
+        }
+        return grid;
+    }
+
+    //simulates the move and gives back the Grids
+    public int[][] left(int egrid[][]) {
+        //all numbers will go left and combine when possible
+        int[][] grid = clone2DArray(egrid);
+        for (int yIndex = 0; yIndex < 4; yIndex++) {
+            for (int xIndex = 3; xIndex > 0; xIndex--) {
+                if (grid[yIndex][xIndex] == grid[yIndex][xIndex - 1]) {
+                    grid[yIndex][xIndex] += grid[yIndex][xIndex];
+                    grid[yIndex][xIndex - 1] = 0;
+                }
+                if (grid[yIndex][xIndex - 1] == 0) {
+                    for (int a = xIndex - 1; a < 3; a++) {
+                        grid[yIndex][a] = grid[yIndex][a + 1];
+                    }
+                    grid[yIndex][3] = 0;
+                }
+            }
+        }
+        return grid;
+    }
+
+    private void zeicheResultat(int grid[][]) {
         for (int index = 0; index < 4; index++) {
             for (int i = 0; i < 4; i++) {
-                if (grid[index][i] == 0) {
-                    for (int a = index; a < 4; a++) {
-                        grid[index][i] = grid[index + 1][i];
-                    }
-                } else if (grid[index][i] == grid[index + 1][i]) {
-                    grid[index][i] += grid[index][i];
-                    for (int a = index + 1; a < 4; a++) {
-                        grid[index][i] = grid[index + 1][i];
-                    }
-                }
+                System.out.print(grid[index][i] + " ");
             }
+            System.out.println("");
         }
-        return grid;
-    }
-//simulates the move and gives back the Grids
-
-    private int[][] down(int grid[][]) {
-        //all numbers will down up and combine when possible
-        for (int index = 3; index >= 0; index--) {
-            for (int i = 3; i > 0; i--) {
-                if (grid[index][i] == 0) {
-                    for (int a = i; a > 0; a--) {
-                        grid[index][i] = grid[index][i - 1];
-                    }
-                } else if (grid[index][i] == grid[index][i - 1]) {
-                    grid[index][i] += grid[index][i];
-                    for (int a = i - 1; a > 0; a--) {
-                        grid[index][i] = grid[index][i - 1];
-                    }
-                }
-            }
-        }
-        return grid;
+        System.out.println("");
     }
 
-    //simulates the move and gives back the Grids
-    private int[][] left(int grid[][]) {
-        //all numbers will go left and combine when possible
-        for (int index = 3; index >= 0; index--) {
-            for (int i = 3; i >= 0; i--) {
-                if (grid[index][i] == 0) {
-                    for (int a = index; a > 0; a--) {
-                        grid[index][i] = grid[index - 1][i];
-                    }
-                } else if (grid[index][i] == grid[index - 1][i]) {
-                    grid[index][i] += grid[index][i];
-                    for (int a = index - 1; a > 0; a--) {
-                        grid[index][i] = grid[index - 1][i];
-                    }
-                }
-            }
+    public static int[][] clone2DArray(int[][] array) {
+        int rows = array.length;
+    //int rowIs=array[0].length ;
+
+        //clone the 'shallow' structure of array
+        int[][] newArray = (int[][]) array.clone();
+        //clone the 'deep' structure of array
+        for (int row = 0; row < rows; row++) {
+            newArray[row] = (int[]) array[row].clone();
         }
-        return grid;
+
+        return newArray;
     }
 }

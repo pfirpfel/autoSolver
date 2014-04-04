@@ -5,6 +5,8 @@
  */
 package autosolver;
 
+import java.util.Arrays;
+
 /**
  *
  * @author Elias
@@ -44,8 +46,14 @@ public class GameState {
         return freeGrids;
     }
 
-    public boolean gridChanged(int grid[][]) {
-
-        return true;
+    public boolean gridChanged(int gridNeu[][],int gritAlt[][]) {
+        for (int index = 0; index < 4; index++) {
+            for (int i = 0; i < 4; i++) {
+                if (gridNeu[index][i] != gritAlt[index][i]) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
