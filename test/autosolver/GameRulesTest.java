@@ -12,10 +12,9 @@ import static org.junit.Assert.*;
  *
  * @author Elias
  */
-public class AutoSolverTest {
+public class GameRulesTest {
 
     //KeyAction k1 = new KeyAction();
-    GameState s1 = new GameState();
     GameRules r1 = new GameRules();
 
     @Test
@@ -49,27 +48,27 @@ public class AutoSolverTest {
     @Test
     public void testFreeGrids0() throws Exception {
         int grid[][] = {{16, 4, 16, 2}, {2, 8, 8, 4}, {2, 2, 4, 8}, {2, 2, 2, 16}};
-        assertEquals(0, s1.gerFreeGrids(grid));
+        assertEquals(0, r1.getAnzahlFreeGrids(grid));
     }
 
     @Test
     public void testFreeGrids16() throws Exception {
         int grid[][] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-        assertEquals(16, s1.gerFreeGrids(grid));
+        assertEquals(16, r1.getAnzahlFreeGrids(grid));
     }
 
     @Test
     public void testGridChangedTrue() throws Exception {
         int grid[][] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
         int grid2[][] = {{16, 4, 16, 2}, {2, 8, 8, 4}, {2, 2, 4, 8}, {2, 2, 2, 16}};
-        assertEquals(true, s1.gridChanged(grid, grid2));
+        assertEquals(true, r1.gridChanged(grid, grid2));
     }
 
     @Test
     public void testGridChangedFalse() throws Exception {
         int grid[][] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
         int grid2[][] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-        assertEquals(false, s1.gridChanged(grid, grid2));
+        assertEquals(false, r1.gridChanged(grid, grid2));
     }
 
     @Test
