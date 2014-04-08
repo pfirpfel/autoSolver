@@ -179,7 +179,7 @@ public class g2048Gui implements GameObserver {
                 message = "Der nächste Schritt ist nach unten";
                 break;
         }
-        JOptionPane.showMessageDialog(null, message, "2048", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, "2048", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void reset() {

@@ -6,6 +6,7 @@
 package g2048;
 
 import java.awt.event.KeyEvent;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -45,6 +46,19 @@ public class g2048 extends AbstractGameSubject {
     public int getScore() {
         return score;
     }
+    private void gewonnenVerloren(){
+        for(int index=0;index<4;index++){
+            for(int i=0;i<4;i++){
+                if(grid[index][i]>=1024){
+                    JOptionPane.showMessageDialog(null, "Bravo sie haben gewonnen", "2048", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        }
+        
+        if(!gridChanged(grid, up())&&!gridChanged(grid, down())&&!gridChanged(grid, right())&&!gridChanged(grid, left())){
+            JOptionPane.showMessageDialog(null, "Sie haben verloren", "2048", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
 
     public enum Direction { UP, DOWN, LEFT, RIGHT }
 
@@ -68,6 +82,7 @@ public class g2048 extends AbstractGameSubject {
             gerFreeGrids(resGrid);
             grid = setzteZufall(resGrid);
             this.notifyObservers(clone2DArray(grid));
+            gewonnenVerloren();
         }
     }
 

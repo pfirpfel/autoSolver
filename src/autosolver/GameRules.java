@@ -51,7 +51,7 @@ public class GameRules {
             } else {
                 resGrid = down(clone2DArray(grid));
             }
-            double Resultat = 0;
+            double Resultat;
             //wenn etwas passiert ist
             if (gridChanged(resGrid, grid)) {//soll er auszählen was es bringt
                 Resultat = getAnzahlFreeGrids(resGrid);
@@ -252,9 +252,9 @@ public class GameRules {
             maxzaehler = 2;
             if (anzahlFreieFelder < 6) {
                 maxzaehler = 3;
-//             if (anzahlFreieFelder<3){
-//                 maxzaehler=3;
-//             }
+             if (anzahlFreieFelder<3){
+                 maxzaehler=4;
+             }
             }
         }
         if (zaehler > maxzaehler) {//wenn er grösser ist als die maximal zulässige Zahl soll abgebrochen werden und 0 zurück gegeben werden.
