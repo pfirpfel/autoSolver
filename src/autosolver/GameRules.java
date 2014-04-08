@@ -6,7 +6,6 @@
 package autosolver;
 
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 
 /**
  *
@@ -14,261 +13,84 @@ import java.util.Arrays;
  */
 public class GameRules {
 
+    //Varaiblendefinition
     double freeGridStart, freeGridUp, freeGridRight, freeGridDown, freeGridLeft;
-//    boolean moveableUp,moveableRight,moveableDown,moveableLeft;
-    //the game starts with two random numbers at random positions
-    //can only go up/down/right/left wiith the arrows
-    //it create with an probability of 90% a 2 or 10% a 4 in one of the emty places
-    //two numbers of the same value can be merged togehter for an higher number
+    int zaehler, score;
 
-    //simulates the move and gives back the new number of free Grids
+    //gives back the best posibel move/key
     public int simulate(int grid[][]) {
         freeGridStart = getAnzahlFreeGrids(grid);
-        simulateStep1(grid);
-        //grösste zahl = beste methode
-        //überprüft welches die grösste zahl ist und liefert den key dazu;
-        double best = freeGridUp;
-        int key = KeyEvent.VK_UP;
-        if (best < freeGridDown) {
-            best = freeGridDown;
-            key = KeyEvent.VK_DOWN;
-        }
-        if (best < freeGridRight) {
-            best = freeGridRight;
+        int best = simulateStep1(grid);
+        int key;
+        if (best == 0) {
             key = KeyEvent.VK_RIGHT;
-        }
-        if (best < freeGridLeft) {
+        } else if (best == 1) {
             key = KeyEvent.VK_LEFT;
+        } else if (best == 2) {
+            key = KeyEvent.VK_UP;
+        } else {
+            key = KeyEvent.VK_DOWN;
         }
         return key;
     }
 
-    private void simulateStep1(int grid[][]) {
-
-        int gridUp[][] = this.up(grid);
-        Arrays.copyOf(grid, grid.length);
-        freeGridUp = getAnzahlFreeGrids(gridUp);
-        if (gridChanged(gridUp, grid)) {
-            freeGridUp+=simulateNextMove(gridUp);
-        } else {
-            freeGridUp -= 100;
-        }
-        int gridDown[][] = this.down(Arrays.copyOf(grid, grid.length));
-        freeGridDown = getAnzahlFreeGrids(gridDown);
-        if (gridChanged(gridDown, grid)) {
-            freeGridDown+=simulateNextMove(gridDown);
-        } else {
-            freeGridDown -= 100;
-        }
-        int gridRight[][] = this.right(Arrays.copyOf(grid, grid.length));
-        freeGridRight = getAnzahlFreeGrids(gridRight);
-
-        if (gridChanged(gridRight, grid)) {
-            freeGridRight+=simulateNextMove(gridRight);
-        } else {
-            freeGridRight -= 100;
-        }
-        int gridLeft[][] = this.left(Arrays.copyOf(grid, grid.length));
-        freeGridLeft = getAnzahlFreeGrids(gridLeft);
-        if (gridChanged(gridLeft, grid)) {
-            freeGridLeft+=simulateNextMove(gridLeft);
-        } else {
-            freeGridLeft -= 100;
-        }
-    }
-//simulates the move and gives back the Grids
-
-    private double simulateNextMove(int egrid[][]) {
+    //simulates the first Step
+    private int simulateStep1(int grid[][]) {
+        //Variablendefiniton
         double bestResultat = -100;
-        int anzahlFreieFelder = getAnzahlFreeGrids(egrid);
-        int freieFelder[][] = getFreeGrids(egrid, anzahlFreieFelder);
-       // int[][] resGrid = clone2DArray(egrid);
-
-        for (int i = 0; i < anzahlFreieFelder; i++) {
-            int[][] testGrid = clone2DArray(egrid);
-            double Resultat;
-            testGrid[freieFelder[i][0]][freieFelder[i][1]] = 2;
-            int[][] resGrid = right(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-                Resultat+=simulateFutureMove(resGrid);
+        int bestDirection = 0;
+        int[][] resGrid;
+        //für alle freien Felder
+        //werden für alle möglichen Richtungen die Ergebnisse simuliert
+        for (int richtung = 0; richtung < 4; richtung++) {
+            if (richtung == 0) {
+                resGrid = right(clone2DArray(grid));
+            } else if (richtung == 1) {
+                resGrid = left(clone2DArray(grid));
+            } else if (richtung == 2) {
+                resGrid = up(clone2DArray(grid));
             } else {
-                Resultat = -100;
+                resGrid = down(clone2DArray(grid));
             }
+            double Resultat = 0;
+            //wenn etwas passiert ist
+            if (gridChanged(resGrid, grid)) {//soll er auszählen was es bringt
+                Resultat = getAnzahlFreeGrids(resGrid);
+                Resultat += score;
+                zaehler = 0;
+                Resultat += simulateFutureMove(resGrid);
+            } else {//wenn nichts passiert ist gib einen negativen Wert zurück
+                Resultat = -100;
+            }//wenn das aktuelle Resultat besser ist als die vorherigen speichere das aktuelle ab mit richtung
+//                System.out.println(richtung+" : "+Resultat);
             if (bestResultat < Resultat) {
                 bestResultat = Resultat;
+                bestDirection = richtung;
             }
-            resGrid = left(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-                Resultat+=simulateFutureMove(resGrid);
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = up(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-                Resultat+=simulateFutureMove(resGrid);
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = down(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-                Resultat+=simulateFutureMove(resGrid);
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            // gleich 4j
-            testGrid[freieFelder[i][0]][freieFelder[i][1]] = 4;
-            resGrid = right(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-                Resultat+=simulateFutureMove(resGrid);
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = left(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-                Resultat+=simulateFutureMove(resGrid);
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = up(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-                Resultat+=simulateFutureMove(resGrid);
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = down(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-                Resultat+=simulateFutureMove(resGrid);
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-        }
-        return bestResultat;
+        }//gib sie beste Richtung zurück
+        return bestDirection;
     }
-    private double simulateFutureMove(int egrid[][]) {
-        double bestResultat = -100;
-        int anzahlFreieFelder = getAnzahlFreeGrids(egrid);
-        int freieFelder[][] = getFreeGrids(egrid, anzahlFreieFelder);
-       // int[][] resGrid = clone2DArray(egrid);
 
-        for (int i = 0; i < anzahlFreieFelder; i++) {
-            int[][] testGrid = clone2DArray(egrid);
-            double Resultat;
-            testGrid[freieFelder[i][0]][freieFelder[i][1]] = 2;
-            int[][] resGrid = right(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = left(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = up(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = down(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.9;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            // gleich 4j
-            testGrid[freieFelder[i][0]][freieFelder[i][1]] = 4;
-            resGrid = right(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = left(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = up(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-            resGrid = down(clone2DArray(testGrid));
-            if (gridChanged(resGrid, testGrid)) {
-                Resultat = getAnzahlFreeGrids(resGrid) * 1.1;
-            } else {
-                Resultat = -100;
-            }
-            if (bestResultat < Resultat) {
-                bestResultat = Resultat;
-            }
-        }
-        return bestResultat;
-    }
-    public int[][] up(int egrid[][]) {
+    public int[][] up(int grid[][]) {
         //all numbers will go up and combine when possible
-        int[][] grid = clone2DArray(egrid);
-        for (int yIndex = 3; yIndex > 0; yIndex--) {
-            for (int xIndex = 0; xIndex < 4; xIndex++) {
+        score = 0;
+        for (int xIndex = 0; xIndex < 4; xIndex++) {
+            for (int yIndex = 3; yIndex > 0; yIndex--) {
+                if (grid[yIndex - 1][xIndex] == 0) {
+                    for (int a = yIndex - 1; a < 3; a++) {
+                        grid[a][xIndex] = grid[a + 1][xIndex];
+                    }
+                    grid[3][xIndex] = 0;
+                }
+            }
+            for (int yIndex = 3; yIndex > 0; yIndex--) {
                 if (grid[yIndex - 1][xIndex] == grid[yIndex][xIndex]) {
+                    score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex] += grid[yIndex][xIndex];
                     grid[yIndex - 1][xIndex] = 0;
                 }
+            }
+            for (int yIndex = 3; yIndex > 0; yIndex--) {
                 if (grid[yIndex - 1][xIndex] == 0) {
                     for (int a = yIndex - 1; a < 3; a++) {
                         grid[a][xIndex] = grid[a + 1][xIndex];
@@ -280,16 +102,26 @@ public class GameRules {
         return grid;
     }
 
-    //simulates the move and gives back the Grids
-    public int[][] right(int egrid[][]) {
+    public int[][] right(int grid[][]) {
         //all numbers will right up and combine when possible
-        int[][] grid = clone2DArray(egrid);
+        score = 0;
         for (int yIndex = 0; yIndex < 4; yIndex++) {
             for (int xIndex = 0; xIndex < 3; xIndex++) {
+                if (grid[yIndex][xIndex + 1] == 0) {
+                    for (int a = xIndex + 1; a > 0; a--) {
+                        grid[yIndex][a] = grid[yIndex][a - 1];
+                    }
+                    grid[yIndex][0] = 0;
+                }
+            }
+            for (int xIndex = 0; xIndex < 3; xIndex++) {
                 if (grid[yIndex][xIndex] == grid[yIndex][xIndex + 1]) {
+                    score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex] += grid[yIndex][xIndex];
                     grid[yIndex][xIndex + 1] = 0;
                 }
+            }
+            for (int xIndex = 0; xIndex < 3; xIndex++) {
                 if (grid[yIndex][xIndex + 1] == 0) {
                     for (int a = xIndex + 1; a > 0; a--) {
                         grid[yIndex][a] = grid[yIndex][a - 1];
@@ -300,17 +132,28 @@ public class GameRules {
         }
         return grid;
     }
-//simulates the move and gives back the Grids
 
-    public int[][] down(int egrid[][]) {
+    public int[][] down(int grid[][]) {
         //all numbers will down up and combine when possible
-        int[][] grid = clone2DArray(egrid);
-        for (int yIndex = 0; yIndex < 3; yIndex++) {
-            for (int xIndex = 0; xIndex < 4; xIndex++) {
+        score = 0;
+        for (int xIndex = 0; xIndex < 4; xIndex++) {
+            for (int yIndex = 0; yIndex < 3; yIndex++) {
+                if (grid[yIndex + 1][xIndex] == 0) {
+                    for (int a = yIndex + 1; a > 0; a--) {
+                        grid[a][xIndex] = grid[a - 1][xIndex];
+                    }
+                    grid[0][xIndex] = 0;
+                }
+            }
+            for (int yIndex = 0; yIndex < 3; yIndex++) {
                 if (grid[yIndex + 1][xIndex] == grid[yIndex][xIndex]) {
+                    score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex] += grid[yIndex][xIndex];
                     grid[yIndex + 1][xIndex] = 0;
                 }
+
+            }
+            for (int yIndex = 0; yIndex < 3; yIndex++) {
                 if (grid[yIndex + 1][xIndex] == 0) {
                     for (int a = yIndex + 1; a > 0; a--) {
                         grid[a][xIndex] = grid[a - 1][xIndex];
@@ -322,16 +165,26 @@ public class GameRules {
         return grid;
     }
 
-    //simulates the move and gives back the Grids
-    public int[][] left(int egrid[][]) {
+    public int[][] left(int grid[][]) {
         //all numbers will go left and combine when possible
-        int[][] grid = clone2DArray(egrid);
+        score = 0;
         for (int yIndex = 0; yIndex < 4; yIndex++) {
             for (int xIndex = 3; xIndex > 0; xIndex--) {
+                if (grid[yIndex][xIndex - 1] == 0) {
+                    for (int a = xIndex - 1; a < 3; a++) {
+                        grid[yIndex][a] = grid[yIndex][a + 1];
+                    }
+                    grid[yIndex][3] = 0;
+                }
+            }
+            for (int xIndex = 3; xIndex > 0; xIndex--) {
                 if (grid[yIndex][xIndex] == grid[yIndex][xIndex - 1]) {
+                    score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex] += grid[yIndex][xIndex];
                     grid[yIndex][xIndex - 1] = 0;
                 }
+            }
+            for (int xIndex = 3; xIndex > 0; xIndex--) {
                 if (grid[yIndex][xIndex - 1] == 0) {
                     for (int a = xIndex - 1; a < 3; a++) {
                         grid[yIndex][a] = grid[yIndex][a + 1];
@@ -343,27 +196,14 @@ public class GameRules {
         return grid;
     }
 
-    private void zeicheResultat(int grid[][]) {
-        for (int index = 0; index < 4; index++) {
-            for (int i = 0; i < 4; i++) {
-                System.out.print(grid[index][i] + " ");
-            }
-            System.out.println("");
-        }
-        System.out.println("");
-    }
-
     private static int[][] clone2DArray(int[][] array) {
         int rows = array.length;
-    //int rowIs=array[0].length ;
-
         //clone the 'shallow' structure of array
         int[][] newArray = (int[][]) array.clone();
         //clone the 'deep' structure of array
         for (int row = 0; row < rows; row++) {
             newArray[row] = (int[]) array[row].clone();
         }
-
         return newArray;
     }
 
@@ -375,13 +215,13 @@ public class GameRules {
                     freeGrids++;
                 }
             }
-        }
+        }//liefert die Anzahl aktuell freier Grids zurück
         return freeGrids;
     }
 
     private int[][] getFreeGrids(int grid[][], int zaehler) {
         int freeGrids[][] = new int[zaehler][2];
-        zaehler=0;
+        zaehler = 0;
         for (int index = 0; index < 4; index++) {
             for (int i = 0; i < 4; i++) {
                 if (grid[index][i] == 0) {
@@ -390,7 +230,7 @@ public class GameRules {
                     zaehler++;
                 }
             }
-        }
+        }//lierfert die Postiionen aller freien Grids zurück
         return freeGrids;
     }
 
@@ -401,7 +241,81 @@ public class GameRules {
                     return true;
                 }
             }
-        }
+        }//lierfert zurück ob sich das Grid geändert hat oder nicht
         return false;
+    }
+
+    private double simulateFutureMove(int egrid[][]) {
+        zaehler++;//Zähler wird bei jedem Aufruf erhöht
+        int anzahlFreieFelder = getAnzahlFreeGrids(egrid);
+        int maxzaehler = 2;
+        if (anzahlFreieFelder < 12) {
+            maxzaehler = 2;
+            if (anzahlFreieFelder < 6) {
+                maxzaehler = 3;
+//             if (anzahlFreieFelder<3){
+//                 maxzaehler=3;
+//             }
+            }
+        }
+        if (zaehler > maxzaehler) {//wenn er grösser ist als die maximal zulässige Zahl soll abgebrochen werden und 0 zurück gegeben werden.
+            score = 0;
+            return 0;
+        }
+        double bestResultat = -100;
+        int freieFelder[][] = getFreeGrids(egrid, anzahlFreieFelder);
+        int[][] resGrid;
+        for (int bin = 0; bin < 2; bin++) {
+            //es werden alle fällle für 2 und 4 simuliert
+            int binero = 0;
+            double multi = 0;
+            if (bin == 0) {
+                binero = 2;
+                multi = 1.9;
+            } else {
+                binero = 4;
+                multi = 1.1;
+            }//es werden für alle freien Felder simmuliert
+            for (int i = 0; i < anzahlFreieFelder; i++) {
+                int[][] testGrid = clone2DArray(egrid);
+                testGrid[freieFelder[i][0]][freieFelder[i][1]] = binero;
+                //es werden für alle Richtungen simuliert
+                for (int richtung = 0; richtung < 4; richtung++) {
+                    if (richtung == 0) {
+                        resGrid = right(clone2DArray(testGrid));
+                    } else if (richtung == 1) {
+                        resGrid = left(clone2DArray(testGrid));
+                    } else if (richtung == 2) {
+                        resGrid = up(clone2DArray(testGrid));
+                    } else {
+                        resGrid = down(clone2DArray(testGrid));
+                    }
+                    double Resultat = 0;
+                    if (gridChanged(resGrid, testGrid)) {
+                        Resultat += score;
+                        Resultat += getAnzahlFreeGrids(resGrid) * (multi);
+                        Resultat += simulateFutureMove(resGrid);
+                        zaehler--;
+                    } else {
+                        Resultat = (-100) / Math.pow(2, zaehler);
+                    }
+//                    Resultat=Resultat/Math.pow(2, zaehler);
+                    if (bestResultat < Resultat) {
+                        bestResultat = Resultat;
+                    }
+                }
+            }
+        }
+        return bestResultat;
+    }
+
+    public void zeicheResultat(int grid[][]) {
+        for (int index = 0; index < 4; index++) {
+            for (int i = 0; i < 4; i++) {
+                System.out.print(grid[index][i] + " ");
+            }
+            System.out.println("");
+        }
+        System.out.println("");
     }
 }
