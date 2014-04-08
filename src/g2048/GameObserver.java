@@ -11,5 +11,5 @@ package g2048;
  * @author Elias
  */
 public interface GameObserver {
-    public int[][] notifyG(int[][] state);
+    public void onStateChange(int[][] state);
 }

@@ -24,7 +24,7 @@ import javax.swing.JPanel;
  *
  * @author Elias
  */
-public class g2048Gui extends AbstractGameSubject {
+public class g2048Gui implements GameObserver {
 
     //Varaiblendefinition
     StandardFenster fenster;
@@ -123,8 +123,8 @@ public class g2048Gui extends AbstractGameSubject {
         menu.add(punkte);
     }
 
-    public void updateBoard() {
-        int[][] b = game.getState();
+    public void updateBoard(int[][] state) {
+        int[][] b = state;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
                 int k = 0;
@@ -200,5 +200,10 @@ public class g2048Gui extends AbstractGameSubject {
 
     public static void main(String[] args) {
         g2048Gui hallo = new g2048Gui();
+    }
+
+    @Override
+    public void onStateChange(int[][] state) {
+        this.updateBoard(state);
     }
 }

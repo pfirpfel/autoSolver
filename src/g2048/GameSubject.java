@@ -12,5 +12,5 @@ package g2048;
  */
 public interface GameSubject {
     public void addGameObserver(GameObserver o);
-    public void remove();
+    public void removeGameObserver(GameObserver o);
 }
