@@ -212,4 +212,7 @@ public class g2048Gui implements GameObserver {
     public void onStateChange(int[][] state) {
         this.updateBoard(state);
     }
+    public static void main(String[] args) {
+        g2048Gui hallo = new g2048Gui();
+    }
 }
