@@ -3,15 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package g2048;
+package autosolver;
+
+import g2048.g2048Gui;
 
 /**
  *
  * @author Elias
  */
-public interface GameSubject {
+public class Starter {
 
-    public void addGameObserver(GameObserver o);
-
-    public void remove();
+    public static void main(String[] args) {
+        g2048Gui hallo = new g2048Gui();
+    }
 }

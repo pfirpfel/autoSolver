@@ -73,9 +73,8 @@ public class GameRulesTest {
 
     @Test
     public void testUp() throws Exception {
-        int grid[][] = {{0, 0, 0, 0}, {16, 0, 0, 2}, {16, 8, 4, 2}, {2, 4, 8, 16}};
-        int grid2[][] = {{32, 8, 4, 4}, {2, 4, 8, 16}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-
+        int grid[][] = {{32, 0, 0, 0}, {16, 0, 0, 2}, {16, 8, 4, 2}, {2, 4, 8, 16}};
+        int grid2[][] = {{32, 8, 4, 4}, {32, 4, 8, 16}, {2, 0, 0, 0}, {0, 0, 0, 0}};
         assertArrayEquals(grid2, r1.up(grid));
     }
 
@@ -99,5 +98,31 @@ public class GameRulesTest {
         int grid[][] = {{16, 0, 16, 2}, {0, 4, 8, 4}, {0, 0, 4, 8}, {0, 2, 2, 16}};
         int grid2[][] = {{32, 2, 0, 0}, {4, 8, 4, 0}, {4, 8, 0, 0}, {4, 16, 0, 0}};
         assertArrayEquals(grid2, r1.left(grid));
+    }
+
+    @Test
+    public void testComplex1() throws Exception {
+        int grid[][] = {{4, 2, 4, 2}, {16, 32, 256, 2}, {1024, 64, 16, 128}, {2, 4, 16, 4}};
+        int grid2[][] = {{32, 2, 0, 0}, {4, 8, 4, 0}, {4, 8, 0, 0}, {4, 16, 0, 0}};
+        System.out.println("Up:");
+        r1.zeicheResultat(r1.up(clone2DArray(grid)));
+        System.out.println("Down:");
+        r1.zeicheResultat(r1.down(clone2DArray(grid)));
+        System.out.println("right:");
+        r1.zeicheResultat(r1.right(clone2DArray(grid)));
+        System.out.println("left:");
+        r1.zeicheResultat(r1.left(clone2DArray(grid)));
+        assertEquals(40, r1.simulate(clone2DArray(grid)));
+    }
+
+    private static int[][] clone2DArray(int[][] array) {
+        int rows = array.length;
+        //clone the 'shallow' structure of array
+        int[][] newArray = (int[][]) array.clone();
+        //clone the 'deep' structure of array
+        for (int row = 0; row < rows; row++) {
+            newArray[row] = (int[]) array[row].clone();
+        }
+        return newArray;
     }
 }

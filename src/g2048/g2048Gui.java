@@ -142,11 +142,13 @@ public class g2048Gui extends AbstractGameSubject {
     }
 
     private void drückPfeiltasten(int e) {
-        if (!autosolver.isInterrupted()) {
-            autosolver.interrupt();
+        if (e >= 37 && e <= 40) {
+            if (!autosolver.isInterrupted()) {
+                autosolver.interrupt();
+            }
+            game.move(e);
+            updateBoard();
         }
-        game.move(e);
-        updateBoard();
     }
 
     private void getHinweis() {
@@ -196,9 +198,5 @@ public class g2048Gui extends AbstractGameSubject {
     public void nextMove(int a) {
         game.move(a);
         updateBoard();
-    }
-
-    public static void main(String[] args) {
-        g2048Gui hallo = new g2048Gui();
     }
 }

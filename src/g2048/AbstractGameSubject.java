@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package g2048;
 
 /**
  *
  * @author Elias
  */
-public abstract class AbstractGameSubject implements  GameSubject{
+public abstract class AbstractGameSubject implements GameSubject {
 
     @Override
     public void addGameObserver(GameObserver o) {
@@ -21,8 +20,9 @@ public abstract class AbstractGameSubject implements  GameSubject{
     public void remove() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
     private int[][] notifyAll(int[][] state) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 }

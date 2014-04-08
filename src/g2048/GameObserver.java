@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package g2048;
 
 /**
@@ -11,5 +10,6 @@ package g2048;
  * @author Elias
  */
 public interface GameObserver {
-    public int[][] notifyG(int[][] state);
+
+    public int[][] notify(int[][] state);
 }

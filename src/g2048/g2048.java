@@ -60,21 +60,30 @@ public class g2048 {
             gerFreeGrids(resGrid);
             resGrid = setzteZufall(resGrid);
         }
-        int[][] egrid = clone2DArray(resGrid);
-        grid = clone2DArray(egrid);
-        return egrid;
+        grid = clone2DArray(resGrid);
+        return clone2DArray(resGrid);
     }
 
     private int[][] up() {
         //all numbers will go up and combine when possible
         int[][] egrid = clone2DArray(grid);
-        for (int yIndex = 3; yIndex > 0; yIndex--) {
-            for (int xIndex = 0; xIndex < 4; xIndex++) {
+        for (int xIndex = 0; xIndex < 4; xIndex++) {
+            for (int yIndex = 3; yIndex > 0; yIndex--) {
+                if (egrid[yIndex - 1][xIndex] == 0) {
+                    for (int a = yIndex - 1; a < 3; a++) {
+                        egrid[a][xIndex] = egrid[a + 1][xIndex];
+                    }
+                    egrid[3][xIndex] = 0;
+                }
+            }
+            for (int yIndex = 3; yIndex > 0; yIndex--) {
                 if (egrid[yIndex - 1][xIndex] == egrid[yIndex][xIndex]) {
                     score += egrid[yIndex][xIndex];
                     egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
                     egrid[yIndex - 1][xIndex] = 0;
                 }
+            }
+            for (int yIndex = 3; yIndex > 0; yIndex--) {
                 if (egrid[yIndex - 1][xIndex] == 0) {
                     for (int a = yIndex - 1; a < 3; a++) {
                         egrid[a][xIndex] = egrid[a + 1][xIndex];
@@ -92,11 +101,21 @@ public class g2048 {
         int[][] egrid = clone2DArray(grid);
         for (int yIndex = 0; yIndex < 4; yIndex++) {
             for (int xIndex = 0; xIndex < 3; xIndex++) {
+                if (egrid[yIndex][xIndex + 1] == 0) {
+                    for (int a = xIndex + 1; a > 0; a--) {
+                        egrid[yIndex][a] = egrid[yIndex][a - 1];
+                    }
+                    egrid[yIndex][0] = 0;
+                }
+            }
+            for (int xIndex = 0; xIndex < 3; xIndex++) {
                 if (egrid[yIndex][xIndex] == egrid[yIndex][xIndex + 1]) {
                     score += egrid[yIndex][xIndex];
                     egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
                     egrid[yIndex][xIndex + 1] = 0;
                 }
+            }
+            for (int xIndex = 0; xIndex < 3; xIndex++) {
                 if (egrid[yIndex][xIndex + 1] == 0) {
                     for (int a = xIndex + 1; a > 0; a--) {
                         egrid[yIndex][a] = egrid[yIndex][a - 1];
@@ -112,13 +131,24 @@ public class g2048 {
     private int[][] down() {
         //all numbers will down up and combine when possible
         int[][] egrid = clone2DArray(grid);
-        for (int yIndex = 0; yIndex < 3; yIndex++) {
-            for (int xIndex = 0; xIndex < 4; xIndex++) {
+        for (int xIndex = 0; xIndex < 4; xIndex++) {
+            for (int yIndex = 0; yIndex < 3; yIndex++) {
+                if (egrid[yIndex + 1][xIndex] == 0) {
+                    for (int a = yIndex + 1; a > 0; a--) {
+                        egrid[a][xIndex] = egrid[a - 1][xIndex];
+                    }
+                    egrid[0][xIndex] = 0;
+                }
+            }
+            for (int yIndex = 0; yIndex < 3; yIndex++) {
                 if (egrid[yIndex + 1][xIndex] == egrid[yIndex][xIndex]) {
                     score += egrid[yIndex][xIndex];
                     egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
                     egrid[yIndex + 1][xIndex] = 0;
                 }
+
+            }
+            for (int yIndex = 0; yIndex < 3; yIndex++) {
                 if (egrid[yIndex + 1][xIndex] == 0) {
                     for (int a = yIndex + 1; a > 0; a--) {
                         egrid[a][xIndex] = egrid[a - 1][xIndex];
@@ -136,11 +166,22 @@ public class g2048 {
         int[][] egrid = clone2DArray(grid);
         for (int yIndex = 0; yIndex < 4; yIndex++) {
             for (int xIndex = 3; xIndex > 0; xIndex--) {
+                if (egrid[yIndex][xIndex - 1] == 0) {
+                    for (int a = xIndex - 1; a < 3; a++) {
+                        egrid[yIndex][a] = egrid[yIndex][a + 1];
+                    }
+                    egrid[yIndex][3] = 0;
+                }
+            }
+            for (int xIndex = 3; xIndex > 0; xIndex--) {
                 if (egrid[yIndex][xIndex] == egrid[yIndex][xIndex - 1]) {
                     score += egrid[yIndex][xIndex];
                     egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
                     egrid[yIndex][xIndex - 1] = 0;
                 }
+
+            }
+            for (int xIndex = 3; xIndex > 0; xIndex--) {
                 if (egrid[yIndex][xIndex - 1] == 0) {
                     for (int a = xIndex - 1; a < 3; a++) {
                         egrid[yIndex][a] = egrid[yIndex][a + 1];

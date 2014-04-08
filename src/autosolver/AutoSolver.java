@@ -14,22 +14,22 @@ import g2048.g2048Gui;
  */
 public class AutoSolver extends Thread {
 
-    GameRules nextStep ;
+    GameRules nextStep;
     g2048Gui gameGui;
     g2048 game;
 
-    public AutoSolver(g2048Gui hallo,GameRules g1,g2048 gam) {
-        nextStep=g1;
-        gameGui=hallo;
-        game=gam;
+    public AutoSolver(g2048Gui hallo, GameRules g1, g2048 gam) {
+        nextStep = g1;
+        gameGui = hallo;
+        game = gam;
     }
 
     @Override
     public void run() {
-        while(! interrupted()){
-        int grid[][]=game.getState();
-        int direction=nextStep.simulate(grid);
-        gameGui.nextMove(direction);
+        while (!interrupted()) {
+            int grid[][] = game.getState();
+            int direction = nextStep.simulate(grid);
+            gameGui.nextMove(direction);
             try {
                 //Thread.sleep(100);
             } catch (Exception ex) {
