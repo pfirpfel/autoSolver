@@ -33,6 +33,7 @@ public class g2048 extends AbstractGameSubject {
         }
         grid = setzteZufall(grid);
         grid = setzteZufall(grid);
+        this.notifyObservers(clone2DArray(grid));
     }
 
     public int[][] getState() {
@@ -65,8 +66,8 @@ public class g2048 extends AbstractGameSubject {
         }
         if (gridChanged(grid, resGrid)) {
             gerFreeGrids(resGrid);
-            resGrid = setzteZufall(resGrid);
-            this.notifyObservers(clone2DArray(resGrid));
+            grid = setzteZufall(resGrid);
+            this.notifyObservers(clone2DArray(grid));
         }
     }
 
@@ -199,7 +200,7 @@ public class g2048 extends AbstractGameSubject {
         return egrid;
     }
 
-    private static int[][] clone2DArray(int[][] array) {
+    public static int[][] clone2DArray(int[][] array) {
         int[][] clone = new int[array.length][array[0].length];
         for(int i = 0; i < array.length; i++){
             System.arraycopy(array[i], 0, clone[i], 0, array[i].length);
