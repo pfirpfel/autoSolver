@@ -21,15 +21,15 @@ public class GameRules {
     //gives back the best possible move
     public Direction simulate(int grid[][]) {
         freeGridStart = getAnzahlFreeGrids(grid);
-        switch(simulateStep1(grid)){
+        switch (simulateStep1(grid)) {
             case 0:
-               return Direction.RIGHT;
-           case 1:
-               return Direction.LEFT;
-           case 2:
-               return Direction.UP;
-           default:
-               return Direction.DOWN;
+                return Direction.RIGHT;
+            case 1:
+                return Direction.LEFT;
+            case 2:
+                return Direction.UP;
+            default:
+                return Direction.DOWN;
         }
     }
 
@@ -82,11 +82,11 @@ public class GameRules {
                     grid[3][xIndex] = 0;
                 }
             }
-            for (int yIndex = 3; yIndex > 0; yIndex--) {
-                if (grid[yIndex - 1][xIndex] == grid[yIndex][xIndex]) {
+            for (int yIndex = 0; yIndex <3; yIndex++) {
+                if (grid[yIndex+1][xIndex] == grid[yIndex][xIndex]) {
                     score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex] += grid[yIndex][xIndex];
-                    grid[yIndex - 1][xIndex] = 0;
+                    grid[yIndex + 1][xIndex] = 0;
                 }
             }
             for (int yIndex = 3; yIndex > 0; yIndex--) {
@@ -113,11 +113,11 @@ public class GameRules {
                     grid[yIndex][0] = 0;
                 }
             }
-            for (int xIndex = 0; xIndex < 3; xIndex++) {
-                if (grid[yIndex][xIndex] == grid[yIndex][xIndex + 1]) {
+            for (int xIndex = 3; xIndex >0; xIndex--) {
+                if (grid[yIndex][xIndex] == grid[yIndex][xIndex - 1]) {
                     score += grid[yIndex][xIndex];
-                    grid[yIndex][xIndex] += grid[yIndex][xIndex];
-                    grid[yIndex][xIndex + 1] = 0;
+                    grid[yIndex][xIndex - 1] += grid[yIndex][xIndex];
+                    grid[yIndex][xIndex] = 0;
                 }
             }
             for (int xIndex = 0; xIndex < 3; xIndex++) {
@@ -144,11 +144,11 @@ public class GameRules {
                     grid[0][xIndex] = 0;
                 }
             }
-            for (int yIndex = 0; yIndex < 3; yIndex++) {
-                if (grid[yIndex + 1][xIndex] == grid[yIndex][xIndex]) {
+            for (int yIndex = 3; yIndex >0; yIndex--) {
+                if (grid[yIndex - 1][xIndex] == grid[yIndex][xIndex]) {
                     score += grid[yIndex][xIndex];
-                    grid[yIndex][xIndex] += grid[yIndex][xIndex];
-                    grid[yIndex + 1][xIndex] = 0;
+                    grid[yIndex - 1][xIndex] += grid[yIndex][xIndex];
+                    grid[yIndex][xIndex] = 0;
                 }
 
             }
@@ -176,11 +176,11 @@ public class GameRules {
                     grid[yIndex][3] = 0;
                 }
             }
-            for (int xIndex = 3; xIndex > 0; xIndex--) {
-                if (grid[yIndex][xIndex] == grid[yIndex][xIndex - 1]) {
+            for (int xIndex = 0; xIndex <3; xIndex++) {
+                if (grid[yIndex][xIndex] == grid[yIndex][xIndex + 1]) {
                     score += grid[yIndex][xIndex];
-                    grid[yIndex][xIndex] += grid[yIndex][xIndex];
-                    grid[yIndex][xIndex - 1] = 0;
+                    grid[yIndex][xIndex + 1] += grid[yIndex][xIndex];
+                    grid[yIndex][xIndex] = 0;
                 }
             }
             for (int xIndex = 3; xIndex > 0; xIndex--) {
@@ -252,9 +252,9 @@ public class GameRules {
             maxzaehler = 2;
             if (anzahlFreieFelder < 6) {
                 maxzaehler = 3;
-             if (anzahlFreieFelder<3){
-                 maxzaehler=4;
-             }
+                if (anzahlFreieFelder < 3) {
+                    maxzaehler = 4;
+                }
             }
         }
         if (zaehler > maxzaehler) {//wenn er grösser ist als die maximal zulässige Zahl soll abgebrochen werden und 0 zurück gegeben werden.

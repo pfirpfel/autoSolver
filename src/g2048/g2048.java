@@ -5,7 +5,6 @@
  */
 package g2048;
 
-import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
 /**
@@ -15,17 +14,21 @@ import javax.swing.JOptionPane;
 public class g2048 extends AbstractGameSubject {
 
     private int grid[][], score;
-    int freeGrids[][] = new int[16][2];
-    int zaehler = 0;
-
+    private final int freeGrids[][];
+    private int zaehler;
+private boolean ende;
     //erstellen eines neuen Spieles
     public g2048() {
+        this.ende = false;
+        this.zaehler = 0;
+        this.freeGrids = new int[16][2];
         reset();
     }
 
     public void reset() {
         //resetet der Spielvariblen
         score = 0;
+        ende=false;
         grid = new int[4][4];
         for (int i = 0; i < 4; i++) {
             for (int index = 0; index < 4; index++) {
@@ -46,25 +49,33 @@ public class g2048 extends AbstractGameSubject {
     public int getScore() {
         return score;
     }
-    private void gewonnenVerloren(){
-        for(int index=0;index<4;index++){
-            for(int i=0;i<4;i++){
-                if(grid[index][i]>=1024){
+    public boolean getEnde(){
+        return ende;
+    }
+    private void gewonnenVerloren() {
+        for (int index = 0; index < 4; index++) {
+            for (int i = 0; i < 4; i++) {
+                if (grid[index][i] >= 2048) {
+                    ende=true;
                     JOptionPane.showMessageDialog(null, "Bravo sie haben gewonnen", "2048", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         }
-        
-        if(!gridChanged(grid, up())&&!gridChanged(grid, down())&&!gridChanged(grid, right())&&!gridChanged(grid, left())){
+
+        if (!gridChanged(grid, up()) && !gridChanged(grid, down()) && !gridChanged(grid, right()) && !gridChanged(grid, left())) {
+            ende=true;
             JOptionPane.showMessageDialog(null, "Sie haben verloren", "2048", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    public enum Direction { UP, DOWN, LEFT, RIGHT }
+    public enum Direction {
+
+        UP, DOWN, LEFT, RIGHT
+    }
 
     public void move(Direction direction) {
         int resGrid[][] = new int[4][4];
-        switch(direction){
+        switch (direction) {
             case UP:
                 resGrid = up();
                 break;
@@ -82,8 +93,9 @@ public class g2048 extends AbstractGameSubject {
             gerFreeGrids(resGrid);
             grid = setzteZufall(resGrid);
             this.notifyObservers(clone2DArray(grid));
-            gewonnenVerloren();
+
         }
+        gewonnenVerloren();
     }
 
     private int[][] up() {
@@ -98,11 +110,11 @@ public class g2048 extends AbstractGameSubject {
                     egrid[3][xIndex] = 0;
                 }
             }
-            for (int yIndex = 3; yIndex > 0; yIndex--) {
-                if (egrid[yIndex - 1][xIndex] == egrid[yIndex][xIndex]) {
+            for (int yIndex = 0; yIndex <3; yIndex++) {
+                if (egrid[yIndex+1][xIndex] == egrid[yIndex][xIndex]) {
                     score += egrid[yIndex][xIndex];
                     egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
-                    egrid[yIndex - 1][xIndex] = 0;
+                    egrid[yIndex + 1][xIndex] = 0;
                 }
             }
             for (int yIndex = 3; yIndex > 0; yIndex--) {
@@ -130,11 +142,11 @@ public class g2048 extends AbstractGameSubject {
                     egrid[yIndex][0] = 0;
                 }
             }
-            for (int xIndex = 0; xIndex < 3; xIndex++) {
-                if (egrid[yIndex][xIndex] == egrid[yIndex][xIndex + 1]) {
+            for (int xIndex = 3; xIndex >0; xIndex--) {
+                if (egrid[yIndex][xIndex] == egrid[yIndex][xIndex - 1]) {
                     score += egrid[yIndex][xIndex];
-                    egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
-                    egrid[yIndex][xIndex + 1] = 0;
+                    egrid[yIndex][xIndex - 1] += egrid[yIndex][xIndex];
+                    egrid[yIndex][xIndex] = 0;
                 }
             }
             for (int xIndex = 0; xIndex < 3; xIndex++) {
@@ -162,11 +174,11 @@ public class g2048 extends AbstractGameSubject {
                     egrid[0][xIndex] = 0;
                 }
             }
-            for (int yIndex = 0; yIndex < 3; yIndex++) {
-                if (egrid[yIndex + 1][xIndex] == egrid[yIndex][xIndex]) {
+            for (int yIndex = 3; yIndex >0; yIndex--) {
+                if (egrid[yIndex - 1][xIndex] == egrid[yIndex][xIndex]) {
                     score += egrid[yIndex][xIndex];
-                    egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
-                    egrid[yIndex + 1][xIndex] = 0;
+                    egrid[yIndex - 1][xIndex] += egrid[yIndex][xIndex];
+                    egrid[yIndex][xIndex] = 0;
                 }
 
             }
@@ -195,13 +207,12 @@ public class g2048 extends AbstractGameSubject {
                     egrid[yIndex][3] = 0;
                 }
             }
-            for (int xIndex = 3; xIndex > 0; xIndex--) {
-                if (egrid[yIndex][xIndex] == egrid[yIndex][xIndex - 1]) {
+            for (int xIndex = 0; xIndex <3; xIndex++) {
+                if (egrid[yIndex][xIndex] == egrid[yIndex][xIndex + 1]) {
                     score += egrid[yIndex][xIndex];
-                    egrid[yIndex][xIndex] += egrid[yIndex][xIndex];
-                    egrid[yIndex][xIndex - 1] = 0;
+                    egrid[yIndex][xIndex + 1] += egrid[yIndex][xIndex];
+                    egrid[yIndex][xIndex] = 0;
                 }
-
             }
             for (int xIndex = 3; xIndex > 0; xIndex--) {
                 if (egrid[yIndex][xIndex - 1] == 0) {
@@ -217,7 +228,7 @@ public class g2048 extends AbstractGameSubject {
 
     public static int[][] clone2DArray(int[][] array) {
         int[][] clone = new int[array.length][array[0].length];
-        for(int i = 0; i < array.length; i++){
+        for (int i = 0; i < array.length; i++) {
             System.arraycopy(array[i], 0, clone[i], 0, array[i].length);
         }
         return clone;

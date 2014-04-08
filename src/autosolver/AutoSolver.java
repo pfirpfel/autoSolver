@@ -15,24 +15,43 @@ import g2048.g2048Gui;
  */
 public class AutoSolver extends Thread {
 
-    GameRules nextStep;
-    g2048Gui gameGui;
-    g2048 game;
+    private final GameRules nextStep;
+    private final g2048Gui gameGui;
+    private final g2048 game;
+    private boolean ende;
+    private boolean calculating;
+    volatile boolean keepRunning;
 
     public AutoSolver(g2048Gui hallo, GameRules g1, g2048 gam) {
+        this.calculating = false;
+        this.keepRunning = true;
+        this.ende = false;
         nextStep = g1;
         gameGui = hallo;
         game = gam;
+        setDaemon(true);
+    }
+
+    public void pleaseStop() {
+        keepRunning = false;
+        calculating=false;
+    }
+    public boolean isCalculating(){
+        return calculating;
     }
 
     @Override
     public void run() {
-        while (!interrupted()) {
+        calculating = true;
+        this.keepRunning = true;
+        this.ende = false;
+        while (keepRunning & !ende) {
             int grid[][] = game.getState();
             Direction direction = nextStep.simulate(grid);
             gameGui.nextMove(direction);
+            ende = game.getEnde();
             try {
-                //Thread.sleep(100);
+                Thread.sleep(500);
             } catch (Exception ex) {
                 interrupt();
                 break;
