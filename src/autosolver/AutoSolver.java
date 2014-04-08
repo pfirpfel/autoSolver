@@ -6,6 +6,7 @@
 package autosolver;
 
 import g2048.g2048;
+import g2048.g2048.Direction;
 import g2048.g2048Gui;
 
 /**
@@ -28,7 +29,7 @@ public class AutoSolver extends Thread {
     public void run() {
         while (!interrupted()) {
             int grid[][] = game.getState();
-            int direction = nextStep.simulate(grid);
+            Direction direction = nextStep.simulate(grid);
             gameGui.nextMove(direction);
             try {
                 //Thread.sleep(100);

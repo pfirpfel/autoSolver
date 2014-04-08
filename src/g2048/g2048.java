@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
  *
  * @author Elias
  */
-public class g2048 {
+public class g2048 extends AbstractGameSubject {
 
     private int grid[][], score;
     int freeGrids[][] = new int[16][2];
@@ -34,6 +34,7 @@ public class g2048 {
         }
         grid = setzteZufall(grid);
         grid = setzteZufall(grid);
+        this.notifyObservers(clone2DArray(grid));
     }
 
     public int[][] getState() {
@@ -59,24 +60,30 @@ public class g2048 {
         }
     }
 
-    public int[][] move(int direction) {
+    public enum Direction { UP, DOWN, LEFT, RIGHT }
+
+    public void move(Direction direction) {
         int resGrid[][] = new int[4][4];
-        if (direction == KeyEvent.VK_UP) {
-            resGrid = up();
-        } else if (direction == KeyEvent.VK_DOWN) {
-            resGrid = down();
-        } else if (direction == KeyEvent.VK_RIGHT) {
-            resGrid = right();
-        } else if (direction == KeyEvent.VK_LEFT) {
-            resGrid = left();
+        switch(direction){
+            case UP:
+                resGrid = up();
+                break;
+            case DOWN:
+                resGrid = down();
+                break;
+            case LEFT:
+                resGrid = left();
+                break;
+            case RIGHT:
+                resGrid = right();
+                break;
         }
         if (gridChanged(grid, resGrid)) {
             gerFreeGrids(resGrid);
-            resGrid = setzteZufall(resGrid);
+            grid = setzteZufall(resGrid);
+            this.notifyObservers(clone2DArray(grid));
+            gewonnenVerloren();
         }
-        grid = clone2DArray(resGrid);
-        gewonnenVerloren();
-        return clone2DArray(resGrid);
     }
 
     private int[][] up() {
@@ -208,15 +215,12 @@ public class g2048 {
         return egrid;
     }
 
-    private static int[][] clone2DArray(int[][] array) {
-        int rows = array.length;
-        //clone the 'shallow' structure of array
-        int[][] newArray = (int[][]) array.clone();
-        //clone the 'deep' structure of array
-        for (int row = 0; row < rows; row++) {
-            newArray[row] = (int[]) array[row].clone();
+    public static int[][] clone2DArray(int[][] array) {
+        int[][] clone = new int[array.length][array[0].length];
+        for(int i = 0; i < array.length; i++){
+            System.arraycopy(array[i], 0, clone[i], 0, array[i].length);
         }
-        return newArray;
+        return clone;
     }
 
     private void gerFreeGrids(int grid[][]) {

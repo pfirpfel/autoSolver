@@ -5,6 +5,7 @@
  */
 package autosolver;
 
+import g2048.g2048.Direction;
 import java.awt.event.KeyEvent;
 
 /**
@@ -17,21 +18,19 @@ public class GameRules {
     double freeGridStart, freeGridUp, freeGridRight, freeGridDown, freeGridLeft;
     int zaehler, score;
 
-    //gives back the best posibel move/key
-    public int simulate(int grid[][]) {
+    //gives back the best possible move
+    public Direction simulate(int grid[][]) {
         freeGridStart = getAnzahlFreeGrids(grid);
-        int best = simulateStep1(grid);
-        int key;
-        if (best == 0) {
-            key = KeyEvent.VK_RIGHT;
-        } else if (best == 1) {
-            key = KeyEvent.VK_LEFT;
-        } else if (best == 2) {
-            key = KeyEvent.VK_UP;
-        } else {
-            key = KeyEvent.VK_DOWN;
+        switch(simulateStep1(grid)){
+            case 0:
+               return Direction.RIGHT;
+           case 1:
+               return Direction.LEFT;
+           case 2:
+               return Direction.UP;
+           default:
+               return Direction.DOWN;
         }
-        return key;
     }
 
     //simulates the first Step
@@ -52,7 +51,7 @@ public class GameRules {
             } else {
                 resGrid = down(clone2DArray(grid));
             }
-            double Resultat = 0;
+            double Resultat;
             //wenn etwas passiert ist
             if (gridChanged(resGrid, grid)) {//soll er auszählen was es bringt
                 Resultat = getAnzahlFreeGrids(resGrid);

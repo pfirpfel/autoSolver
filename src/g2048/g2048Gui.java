@@ -7,6 +7,7 @@ package g2048;
 
 import autosolver.AutoSolver;
 import autosolver.GameRules;
+import g2048.g2048.Direction;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -24,7 +25,7 @@ import javax.swing.JPanel;
  *
  * @author Elias
  */
-public class g2048Gui extends AbstractGameSubject {
+public class g2048Gui implements GameObserver {
 
     //Varaiblendefinition
     StandardFenster fenster;
@@ -47,7 +48,8 @@ public class g2048Gui extends AbstractGameSubject {
         new ImageIcon(this.getClass().getResource("./images/1024.png")),
         new ImageIcon(this.getClass().getResource("./images/2048.png"))
     };
-    int bineros[][] = {{0, 1}, {1, 2}, {2, 4}, {3, 8}, {4, 16}, {5, 32}, {6, 64}, {7, 128}, {8, 256}, {9, 512}, {10, 1024}, {11, 2048}};
+    int powersOfTwo[] = {1,2,4,8,16,32,64,128,256,512,1024,2048};
+
     //gjh
     g2048 game;
     GameRules nextGameStep;
@@ -56,12 +58,11 @@ public class g2048Gui extends AbstractGameSubject {
 
     public g2048Gui() {
         g2048 mainGame = new g2048();
-        GameRules nextGameStep = new GameRules();
-        Thread autosolver = new Thread(new AutoSolver(this, nextGameStep, mainGame));
+        nextGameStep = new GameRules();
+        autosolver = new Thread(new AutoSolver(this, nextGameStep, mainGame));
 //gj
         this.game = mainGame;
-        this.nextGameStep = nextGameStep;
-        this.autosolver = autosolver;
+        this.game.addGameObserver(this);
         //fh
         fenster = new StandardFenster(500, 500, "2048");
         fenster.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -72,15 +73,14 @@ public class g2048Gui extends AbstractGameSubject {
         });
         hintergrund.setBackground(new Color(187, 173, 160));
         fenster.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        for (int i = 0; i < grid.length; i++) {
+        for (JButton[] row : grid) {
             for (int j = 0; j < grid.length; j++) {
-                grid[i][j] = new JButton();
-                grid[i][j].setEnabled(false);
-                hintergrund.add(grid[i][j]);
+                row[j] = new JButton();
+                row[j].setEnabled(false);
+                hintergrund.add(row[j]);
             }
         }
         reset();
-        updateBoard();
         fenster.add(hintergrund);
 
         fenster.setLocationRelativeTo(null);
@@ -123,54 +123,67 @@ public class g2048Gui extends AbstractGameSubject {
         menu.add(punkte);
     }
 
-    public void updateBoard() {
-        int[][] b = game.getState();
+    public void updateBoard(int[][] state) {
+        int[][] b = state;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
-                int k = 0;
-                for (int bin = 0; bin < 12; bin++) {
-                    if (b[i][j] == bineros[bin][1]) {
-                        k = bineros[bin][0];
-                        break;
-                    }
+                int icon = 0;
+                if(b[i][j] > 0){
+                    icon = (int)(Math.log(b[i][j])/Math.log(2));
                 }
-                grid[i][j].setIcon(tiles[k]);
-                grid[i][j].setDisabledIcon(tiles[k]);
+                grid[i][j].setIcon(tiles[icon]);
+                grid[i][j].setDisabledIcon(tiles[icon]);
             }
         }
         this.punkte.setText("Punkte: " + game.getScore());
     }
 
     private void drückPfeiltasten(int e) {
-        if (e >= 37 && e <= 40) {
-            if (!autosolver.isInterrupted()) {
-                autosolver.interrupt();
-            }
-            game.move(e);
-            updateBoard();
+        Direction direction = null;
+        switch(e){
+            case 37:
+                direction = Direction.LEFT;
+                break;
+            case 38:
+                direction = Direction.UP;
+                break;
+            case 39:
+                direction = Direction.RIGHT;
+                break;
+            case 40:
+                direction = Direction.DOWN;
+                break;
+        }
+        if (!autosolver.isInterrupted()) {
+            autosolver.interrupt();
+        }
+        if(direction != null){
+            game.move(direction);
         }
     }
 
     private void getHinweis() {
         autosolver.interrupt();
-        int[][] b = game.getState();
-        int a = nextGameStep.simulate(b);
-        if (a == 37) {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach links", "2048", JOptionPane.INFORMATION_MESSAGE);
-        } else if (a == 39) {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach rechts", "2048", JOptionPane.INFORMATION_MESSAGE);
-        } else if (a == 38) {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach oben", "2048", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach unten", "2048", JOptionPane.INFORMATION_MESSAGE);
+        String message = "";
+        switch(nextGameStep.simulate(game.getState())){
+            case LEFT:
+                message = "Der nächste Schritt ist nach links";
+                break;
+            case RIGHT:
+                message = "Der nächste Schritt ist nach rechts";
+                break;
+            case UP:
+                message = "Der nächste Schritt ist nach oben";
+                break;
+            case DOWN:
+                message = "Der nächste Schritt ist nach unten";
+                break;
         }
+        JOptionPane.showMessageDialog(null, message, "2048", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void reset() {
-        //autosolver.interrupt();
         game.reset();
-        int[][] b = game.getState();
-        updateBoard();
     }
 
     private void auto() {
@@ -189,14 +202,16 @@ public class g2048Gui extends AbstractGameSubject {
 
     private void nextStep() {
         autosolver.interrupt();
-        int[][] b = game.getState();
-        int a = nextGameStep.simulate(b);
-        game.move(a);
-        updateBoard();
+        Direction suggestedStep = nextGameStep.simulate(game.getState());
+        game.move(suggestedStep);
     }
 
-    public void nextMove(int a) {
+    public void nextMove(Direction a) {
         game.move(a);
-        updateBoard();
+    }
+
+    @Override
+    public void onStateChange(int[][] state) {
+        this.updateBoard(state);
     }
 }

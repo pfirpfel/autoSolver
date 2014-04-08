@@ -5,24 +5,32 @@
  */
 package g2048;
 
+import java.util.HashSet;
+
 /**
  *
  * @author Elias
  */
-public abstract class AbstractGameSubject implements GameSubject {
+public abstract class AbstractGameSubject implements  GameSubject {
+    private final HashSet<GameObserver> observers = new HashSet();
 
     @Override
     public void addGameObserver(GameObserver o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        observers.add(o);
     }
 
     @Override
-    public void remove() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void removeGameObserver(GameObserver o) {
+        observers.remove(o);
     }
-
-    private int[][] notifyAll(int[][] state) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    protected void notifyObservers(int[][] state){
+        HashSet<GameObserver> copy;
+        synchronized(observers){
+            copy = new HashSet(observers);
+        }
+        for(GameObserver o : copy){
+            o.onStateChange(state);
+        }
     }
-
 }
