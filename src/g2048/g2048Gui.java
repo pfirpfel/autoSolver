@@ -156,13 +156,13 @@ public class g2048Gui extends AbstractGameSubject {
         int[][] b = game.getState();
         int a = nextGameStep.simulate(b);
         if (a == 37) {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach links", "2048", JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach links", "2048", JOptionPane.INFORMATION_MESSAGE);
         } else if (a == 39) {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach rechts", "2048", JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach rechts", "2048", JOptionPane.INFORMATION_MESSAGE);
         } else if (a == 38) {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach oben", "2048", JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach oben", "2048", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach unten", "2048", JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Der nächste Schritt ist nach unten", "2048", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
