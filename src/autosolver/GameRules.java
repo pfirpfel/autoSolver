@@ -1,26 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package autosolver;
 
 import g2048.g2048.Direction;
-import java.awt.event.KeyEvent;
+import static g2048.g2048.clone2DArray;
 
 /**
+ * Diese Klasse berechnet mit übergebenen Werten was der nächste logische
+ * Speilzug ist und liefert diesen zurück
  *
  * @author Elias
  */
 public class GameRules {
 
     //Varaiblendefinition
-    double freeGridStart, freeGridUp, freeGridRight, freeGridDown, freeGridLeft;
-    int zaehler, score;
+    int zaehler;//zählt die Tiefe der Vorausschaungs-berechnung
+    int score; //zählt den Punktestand
 
-    //gives back the best possible move
+    /**
+     * berechnet mit den übergebenen Werten den nächsten Schritt.
+     *
+     * @param grid
+     * @return the best possible move
+     */
     public Direction simulate(int grid[][]) {
-        freeGridStart = getAnzahlFreeGrids(grid);
         switch (simulateStep1(grid)) {
             case 0:
                 return Direction.RIGHT;
@@ -36,9 +37,9 @@ public class GameRules {
     //simulates the first Step
     private int simulateStep1(int grid[][]) {
         //Variablendefiniton
-        double bestResultat = -100;
-        int bestDirection = 0;
-        int[][] resGrid;
+        double bestResultat = -100; //speichert das best mögliche Resultat für diesen Schritt
+        int bestDirection = 0; //speichert die Richtung, die das beste Resultat hat
+        int[][] resGrid;//speichert die Resultate der Simulation
         //für alle freien Felder
         //werden für alle möglichen Richtungen die Ergebnisse simuliert
         for (int richtung = 0; richtung < 4; richtung++) {
@@ -61,17 +62,22 @@ public class GameRules {
             } else {//wenn nichts passiert ist gib einen negativen Wert zurück
                 Resultat = -100;
             }//wenn das aktuelle Resultat besser ist als die vorherigen speichere das aktuelle ab mit richtung
-//                System.out.println(richtung+" : "+Resultat);
             if (bestResultat < Resultat) {
                 bestResultat = Resultat;
                 bestDirection = richtung;
             }
-        }//gib sie beste Richtung zurück
+        }//gib die beste Richtung zurück
         return bestDirection;
     }
 
+    /**
+     * all numbers will go up and combine when possible. calculating the score
+     * and Game State
+     *
+     * @param grid
+     * @return GameState after this move
+     */
     public int[][] up(int grid[][]) {
-        //all numbers will go up and combine when possible
         score = 0;
         for (int xIndex = 0; xIndex < 4; xIndex++) {
             for (int yIndex = 3; yIndex > 0; yIndex--) {
@@ -82,8 +88,8 @@ public class GameRules {
                     grid[3][xIndex] = 0;
                 }
             }
-            for (int yIndex = 0; yIndex <3; yIndex++) {
-                if (grid[yIndex+1][xIndex] == grid[yIndex][xIndex]) {
+            for (int yIndex = 0; yIndex < 3; yIndex++) {
+                if (grid[yIndex + 1][xIndex] == grid[yIndex][xIndex]) {
                     score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex] += grid[yIndex][xIndex];
                     grid[yIndex + 1][xIndex] = 0;
@@ -101,8 +107,14 @@ public class GameRules {
         return grid;
     }
 
+    /**
+     * all numbers will go right and combine when possible. calculating the
+     * score and Game State
+     *
+     * @param grid
+     * @return GameState after this move
+     */
     public int[][] right(int grid[][]) {
-        //all numbers will right up and combine when possible
         score = 0;
         for (int yIndex = 0; yIndex < 4; yIndex++) {
             for (int xIndex = 0; xIndex < 3; xIndex++) {
@@ -113,7 +125,7 @@ public class GameRules {
                     grid[yIndex][0] = 0;
                 }
             }
-            for (int xIndex = 3; xIndex >0; xIndex--) {
+            for (int xIndex = 3; xIndex > 0; xIndex--) {
                 if (grid[yIndex][xIndex] == grid[yIndex][xIndex - 1]) {
                     score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex - 1] += grid[yIndex][xIndex];
@@ -132,8 +144,14 @@ public class GameRules {
         return grid;
     }
 
+    /**
+     * all numbers will go down and combine when possible. calculating the score
+     * and Game State
+     *
+     * @param grid
+     * @return GameState after this move
+     */
     public int[][] down(int grid[][]) {
-        //all numbers will down up and combine when possible
         score = 0;
         for (int xIndex = 0; xIndex < 4; xIndex++) {
             for (int yIndex = 0; yIndex < 3; yIndex++) {
@@ -144,7 +162,7 @@ public class GameRules {
                     grid[0][xIndex] = 0;
                 }
             }
-            for (int yIndex = 3; yIndex >0; yIndex--) {
+            for (int yIndex = 3; yIndex > 0; yIndex--) {
                 if (grid[yIndex - 1][xIndex] == grid[yIndex][xIndex]) {
                     score += grid[yIndex][xIndex];
                     grid[yIndex - 1][xIndex] += grid[yIndex][xIndex];
@@ -164,8 +182,14 @@ public class GameRules {
         return grid;
     }
 
+    /**
+     * all numbers will go left and combine when possible. calculating the score
+     * and Game State
+     *
+     * @param grid
+     * @return GameState after this move
+     */
     public int[][] left(int grid[][]) {
-        //all numbers will go left and combine when possible
         score = 0;
         for (int yIndex = 0; yIndex < 4; yIndex++) {
             for (int xIndex = 3; xIndex > 0; xIndex--) {
@@ -176,7 +200,7 @@ public class GameRules {
                     grid[yIndex][3] = 0;
                 }
             }
-            for (int xIndex = 0; xIndex <3; xIndex++) {
+            for (int xIndex = 0; xIndex < 3; xIndex++) {
                 if (grid[yIndex][xIndex] == grid[yIndex][xIndex + 1]) {
                     score += grid[yIndex][xIndex];
                     grid[yIndex][xIndex + 1] += grid[yIndex][xIndex];
@@ -195,17 +219,10 @@ public class GameRules {
         return grid;
     }
 
-    private static int[][] clone2DArray(int[][] array) {
-        int rows = array.length;
-        //clone the 'shallow' structure of array
-        int[][] newArray = (int[][]) array.clone();
-        //clone the 'deep' structure of array
-        for (int row = 0; row < rows; row++) {
-            newArray[row] = (int[]) array[row].clone();
-        }
-        return newArray;
-    }
-
+    /**
+     * @param grid
+     * @return the number of Free Grids.
+     */
     public int getAnzahlFreeGrids(int grid[][]) {
         int freeGrids = 0;//number of grids with 0
         for (int index = 0; index < 4; index++) {
@@ -229,10 +246,16 @@ public class GameRules {
                     zaehler++;
                 }
             }
-        }//lierfert die Postiionen aller freien Grids zurück
+        }//gibt eine Liste zurück mit den Positionen der freien Grids.
         return freeGrids;
     }
 
+    /**
+     *
+     * @param gridNeu
+     * @param gritAlt
+     * @return returns if the Grid has changed or not -true/false
+     */
     public boolean gridChanged(int gridNeu[][], int gritAlt[][]) {
         for (int index = 0; index < 4; index++) {
             for (int i = 0; i < 4; i++) {
@@ -240,14 +263,14 @@ public class GameRules {
                     return true;
                 }
             }
-        }//lierfert zurück ob sich das Grid geändert hat oder nicht
+        }
         return false;
     }
 
-    private double simulateFutureMove(int egrid[][]) {
+    private double simulateFutureMove(int egrid[][]) {//simuliert zukünftige Schritte
         zaehler++;//Zähler wird bei jedem Aufruf erhöht
         int anzahlFreieFelder = getAnzahlFreeGrids(egrid);
-        int maxzaehler = 2;
+        int maxzaehler = 2;//es wird geschaut wie viele Schritte in die Zukunft geschaut werden kann ohne die Rechenzeit zu überschreiten.
         if (anzahlFreieFelder < 12) {
             maxzaehler = 2;
             if (anzahlFreieFelder < 6) {
@@ -261,24 +284,24 @@ public class GameRules {
             score = 0;
             return 0;
         }
-        double bestResultat = -100;
-        int freieFelder[][] = getFreeGrids(egrid, anzahlFreieFelder);
-        int[][] resGrid;
+        double bestResultat = -100;//speichert das beste Resulat
+        int freieFelder[][] = getFreeGrids(egrid, anzahlFreieFelder);//Positionen der freine Grids
+        int[][] resGrid; //Resultate Grid
         for (int bin = 0; bin < 2; bin++) {
             //es werden alle fällle für 2 und 4 simuliert
-            int binero = 0;
-            double multi = 0;
+            int binero;//speichern der Zahl
+            double multi; //speichern des Multiplikators mit dem das Resultat verechnet wird.
             if (bin == 0) {
                 binero = 2;
                 multi = 1.9;
             } else {
                 binero = 4;
                 multi = 1.1;
-            }//es werden für alle freien Felder simmuliert
+            }//es wird für alle möglichen freien Felder simmuliert
             for (int i = 0; i < anzahlFreieFelder; i++) {
                 int[][] testGrid = clone2DArray(egrid);
                 testGrid[freieFelder[i][0]][freieFelder[i][1]] = binero;
-                //es werden für alle Richtungen simuliert
+                //es wird für alle Richtungen simuliert
                 for (int richtung = 0; richtung < 4; richtung++) {
                     if (richtung == 0) {
                         resGrid = right(clone2DArray(testGrid));
@@ -290,31 +313,20 @@ public class GameRules {
                         resGrid = down(clone2DArray(testGrid));
                     }
                     double Resultat = 0;
-                    if (gridChanged(resGrid, testGrid)) {
-                        Resultat += score;
+                    if (gridChanged(resGrid, testGrid)) {//wenn sich was geändert hat
+                        Resultat += score;//simuliere weiter und speichere das Resultat
                         Resultat += getAnzahlFreeGrids(resGrid) * (multi);
                         Resultat += simulateFutureMove(resGrid);
                         zaehler--;
-                    } else {
+                    } else {//wenn nicht gib einen negativen Wert zurück der mit zunähmender Tiefe an Gewichtung verliert
                         Resultat = (-100) / Math.pow(2, zaehler);
                     }
-//                    Resultat=Resultat/Math.pow(2, zaehler);
-                    if (bestResultat < Resultat) {
+                    if (bestResultat < Resultat) {//überprüfe welches das beste Resultat ist.
                         bestResultat = Resultat;
                     }
                 }
             }
         }
-        return bestResultat;
-    }
-
-    public void zeicheResultat(int grid[][]) {
-        for (int index = 0; index < 4; index++) {
-            for (int i = 0; i < 4; i++) {
-                System.out.print(grid[index][i] + " ");
-            }
-            System.out.println("");
-        }
-        System.out.println("");
+        return bestResultat;//liefere das beste Resultat zurück
     }
 }

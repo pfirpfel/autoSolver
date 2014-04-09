@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package g2048;
 
 import autosolver.AutoSolver;
@@ -22,12 +17,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
+ * this is the class that is responsible for the Gui of the game 2048
  *
  * @author Elias
  */
 public class g2048Gui implements GameObserver {
 
-    //Varaiblendefinition
+    //Variablendefinition
     private final StandardFenster fenster;
     private final JPanel hintergrund;
     private final JMenuBar menu = new JMenuBar();
@@ -52,13 +48,14 @@ public class g2048Gui implements GameObserver {
     private final g2048 game;
     private final GameRules nextGameStep;
     private AutoSolver autosolver;
-    private boolean firstStart;
 
+    /**
+     * creates an new Gui for the gaame 2048 with all required variables
+     */
     public g2048Gui() {
         this.powersOfTwo = new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048};
         this.hintergrund = new JPanel(new GridLayout(4, 4));
         this.grid = new JButton[4][4];
-        this.firstStart = true;
         g2048 mainGame = new g2048();
         nextGameStep = new GameRules();
         restartThread();
@@ -68,7 +65,9 @@ public class g2048Gui implements GameObserver {
         fenster.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                drückPfeiltasten(evt.getKeyCode());
+                if (!game.getEnde()) {
+                    drückPfeiltasten(evt.getKeyCode());
+                }
             }
         });
         hintergrund.setBackground(new Color(187, 173, 160));
@@ -89,7 +88,9 @@ public class g2048Gui implements GameObserver {
         tipp.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event) {
-                getHinweis();
+                if (!game.getEnde()) {
+                    getHinweis();
+                }
             }
         });
         menu.add(tipp);
@@ -105,7 +106,9 @@ public class g2048Gui implements GameObserver {
         auto.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event) {
-                auto();
+                if (!game.getEnde()) {
+                    auto();
+                }
             }
         });
         menu.add(auto);
@@ -113,7 +116,9 @@ public class g2048Gui implements GameObserver {
         nextStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event) {
-                nextStep();
+                if (!game.getEnde()) {
+                    nextStep();
+                }
             }
         });
         menu.add(nextStep);
@@ -123,10 +128,14 @@ public class g2048Gui implements GameObserver {
         menu.add(punkte);
     }
 
-    private void restartThread() {
+    private void restartThread() {//restarts the Tread 
         autosolver = new AutoSolver(this, nextGameStep, game);
     }
 
+    /**
+     * updates the Gui with the newest inforamtion of the game
+     * @param state
+     */
     public void updateBoard(int[][] state) {
         int[][] b = state;
         for (int i = 0; i < grid.length; i++) {
@@ -142,7 +151,7 @@ public class g2048Gui implements GameObserver {
         this.punkte.setText("Punkte: " + game.getScore());
     }
 
-    private void drückPfeiltasten(int e) {
+    private void drückPfeiltasten(int e) {//action when an arrow key is hit
         Direction direction = null;
         switch (e) {
             case 37:
@@ -164,7 +173,7 @@ public class g2048Gui implements GameObserver {
         }
     }
 
-    private void getHinweis() {
+    private void getHinweis() {//action if the user wants an hint
         autosolver.pleaseStop();
         String message = "";
         switch (nextGameStep.simulate(game.getState())) {
@@ -184,12 +193,12 @@ public class g2048Gui implements GameObserver {
         JOptionPane.showMessageDialog(null, message, "2048", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void reset() {
+    private void reset() {//resets the game
         autosolver.pleaseStop();
         game.reset();
     }
 
-    private void auto() {
+    private void auto() {//automatically palys the game until an other input is done
         if (autosolver.isCalculating()) {
             autosolver.pleaseStop();
         } else {
@@ -198,21 +207,18 @@ public class g2048Gui implements GameObserver {
         }
     }
 
-    private void nextStep() {
+    private void nextStep() {//makes the next logical step
         autosolver.pleaseStop();
         Direction suggestedStep = nextGameStep.simulate(game.getState());
         game.move(suggestedStep);
     }
 
-    public void nextMove(Direction a) {
+    public void nextMove(Direction a) {//makes the move
         game.move(a);
     }
 
     @Override
-    public void onStateChange(int[][] state) {
+    public void onStateChange(int[][] state) {//the board is updated whenever the state of the game changes
         this.updateBoard(state);
-    }
-    public static void main(String[] args) {
-        g2048Gui hallo = new g2048Gui();
     }
 }

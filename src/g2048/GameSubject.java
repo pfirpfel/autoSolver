@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package g2048;
 
 /**
@@ -11,6 +6,15 @@ package g2048;
  */
 public interface GameSubject {
 
+    /**
+     *
+     * @param o
+     */
     public void addGameObserver(GameObserver o);
+
+    /**
+     *
+     * @param o
+     */
     public void removeGameObserver(GameObserver o);
 }
