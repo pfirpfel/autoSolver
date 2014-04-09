@@ -25,7 +25,7 @@ public class StandardFenster extends javax.swing.JFrame {
         setResizable(false);
         setTitle(titel);
         //Icon
-        Image icon = new ImageIcon("images/battlefield.png").getImage();
+        Image icon = new ImageIcon(this.getClass().getResource("images/battlefield.png")).getImage();
         setIconImage(icon);
         setVisible(true);
         setResizable(false);

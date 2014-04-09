@@ -13,6 +13,8 @@ public class Starter {
      * @param args
      */
     public static void main(String[] args) {
-        g2048Gui hallo = new g2048Gui();
+        StandardFenster fenster = new StandardFenster(500, 500, "2048");
+        g2048Gui hallo = new g2048Gui(fenster);
+        
     }
 }

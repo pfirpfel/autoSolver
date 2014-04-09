@@ -51,8 +51,10 @@ public class g2048Gui implements GameObserver {
 
     /**
      * creates an new Gui for the gaame 2048 with all required variables
+     * @param fensterImport
      */
-    public g2048Gui() {
+    public g2048Gui(StandardFenster fensterImport) {
+        this.fenster=fensterImport;
         this.powersOfTwo = new int[]{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048};
         this.hintergrund = new JPanel(new GridLayout(4, 4));
         this.grid = new JButton[4][4];
@@ -61,7 +63,7 @@ public class g2048Gui implements GameObserver {
         restartThread();
         this.game = mainGame;
         this.game.addGameObserver(this);
-        fenster = new StandardFenster(500, 500, "2048");
+        
         fenster.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyPressed(java.awt.event.KeyEvent evt) {
